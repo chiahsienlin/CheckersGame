@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 CINES
 =====
 CINES is Two player chess created in Qt-cross platform.
@@ -29,3 +30,7 @@ $ git clone https://github.com/tripples/CHESS-in-Qt.git; cd CHESS-in-Qt
 $ ~/Qt/5.11.0/clang_64/bin/qmake .
 $ make
 $~/Qt/5.11.0/clang_64/bin/macdeployqt build/Chess.app
+=======
+# CheckersGame
+The final Project for AI course.
+>>>>>>> origin/master
