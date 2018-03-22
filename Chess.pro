@@ -24,11 +24,13 @@ RCC_DIR = $$DESTDIR/qrc
 SOURCES += main.cpp\
         mainwindow.cpp \
     tile.cpp \
-    validation.cpp
+    validation.cpp \
+    ai_player.cpp
 
 HEADERS  += mainwindow.h \
     tile.h \
-    validation.h
+    validation.h \
+    ai_player.h
 
 FORMS    += mainwindow.ui
 
