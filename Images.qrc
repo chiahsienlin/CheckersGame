@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/pawn_black.svg</file>
+        <file>Images/pawn_white.svg</file>
+        <file>Images/profile.png</file>
+    </qresource>
+</RCC>
