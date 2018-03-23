@@ -19,79 +19,81 @@ int validation::validatePawn(Tile *temp)
     row=temp->row;
     col=temp->col;
     retVal=0;
+    bool right_enemy = false;
+    bool left_enemy = false;
     //Black(bottom)
     if(!temp->pieceColor)
     {
-        //upperleft
+        //upperleft have enemy
         if(row-1 >= 0 && col-1 >= 0){
-            //have enemy
-            if(tile[row-1][col-1]->piece){
-                if(row-2 >=0 && col-2 >= 0 && !tile[row-2][col-2]->piece && tile[row-1][col-1]->pieceColor == 1){
+            if(tile[row-1][col-1]->piece && tile[row-1][col-1]->pieceColor == 1){
+                if(row-2 >=0 && col-2 >= 0 && !tile[row-2][col-2]->piece){
                     exp.push_back(tile[row-2][col-2]->tileNum);
                     eat.push_back(tile[row-1][col-1]->tileNum);
                     retVal=1;
+                    left_enemy=true;
                 }
             }
-            //empty
-            else{
-                exp.push_back(tile[row-1][col-1]->tileNum);
-                retVal=1;
-            }
         }
-        //upperright
+        //upperright have enemy
         if(row-1 >= 0 && col+1 <6){
-            //have enemy
-            if(tile[row-1][col+1]->piece){
-                if(row-2>=0 && col+2 < 6 && !tile[row-2][col+2]->piece && tile[row-1][col+1]->pieceColor == 1){
+            if(tile[row-1][col+1]->piece && tile[row-1][col+1]->pieceColor == 1){
+                if(row-2>=0 && col+2 < 6 && !tile[row-2][col+2]->piece){
                     exp.push_back(tile[row-2][col+2]->tileNum);
                     eat.push_back(tile[row-1][col+1]->tileNum);
                     retVal=1;
+                    right_enemy=true;
                 }
             }
-            //empty
-            else{
-                exp.push_back(tile[row-1][col+1]->tileNum);
-                retVal=1;
-            }
+        }
+        //upperleft is empty and there is no enemy on the right
+        if(!right_enemy && row-1 >= 0 && col-1 >= 0 && !tile[row-1][col-1]->piece){
+            exp.push_back(tile[row-1][col-1]->tileNum);
+            retVal=1;
+        }
+        //upperright is empty and there is no enemy on the left
+        if(!left_enemy && row-1 >= 0 && col+1 <6 && !tile[row-1][col+1]->piece){
+            exp.push_back(tile[row-1][col+1]->tileNum);
+            retVal=1;
         }
     }
     //White(top)
     else
     {
-        //upperleft
+        //upperleft have enemy
         if(row+1<6 && col+1<6){
-            //have enemy
-            if(tile[row+1][col+1]->piece){
-                if(row+2<6 && col+2<6 && !tile[row+2][col+2]->piece && tile[row+1][col+1]->pieceColor == 0){
+            if(tile[row+1][col+1]->piece && tile[row+1][col+1]->pieceColor == 0){
+                if(row+2<6 && col+2<6 && !tile[row+2][col+2]->piece){
                     exp.push_back(tile[row+2][col+2]->tileNum);
                     eat.push_back(tile[row+1][col+1]->tileNum);
                     qDebug() << "Add left enemy.   vector size = " << eat.size();
                     retVal=1;
+                    left_enemy=true;
                 }
             }
-            //empty
-            else{
-                exp.push_back(tile[row+1][col+1]->tileNum);
-                retVal=1;
-            }
-
         }
-        //upperright
+        //upperright have enemy
         if(row+1<6 && col-1 >= 0){
-            //have enemy
-            if(tile[row+1][col-1]->piece){
-                if(row+2<6 && col-2 >= 0 && !tile[row+2][col-2]->piece && tile[row+1][col-1]->pieceColor == 0){
+            if(tile[row+1][col-1]->piece && tile[row+1][col-1]->pieceColor == 0){
+                if(row+2<6 && col-2 >= 0 && !tile[row+2][col-2]->piece){
                     exp.push_back(tile[row+2][col-2]->tileNum);
                     eat.push_back(tile[row+1][col-1]->tileNum);
                     qDebug() << "Add right enemy.   vector size = " << eat.size();
                     retVal=1;
+                    right_enemy=true;
                 }
             }
-            //empty
-            else{
-                exp.push_back(tile[row+1][col-1]->tileNum);
-                retVal=1;
-            }
+        }
+        //upperleft is empty and there is no enemy on the right
+        if(!right_enemy && row+1<6 && col+1<6 && !tile[row+1][col+1]->piece){
+            exp.push_back(tile[row+1][col+1]->tileNum);
+            retVal=1;
+        }
+
+        //upperright is empty and there is no enemy on the right
+        if(!left_enemy && row+1<6 && col-1 >= 0 && !tile[row+1][col-1]->piece){
+            exp.push_back(tile[row+1][col-1]->tileNum);
+            retVal=1;
         }
     }
     return retVal;

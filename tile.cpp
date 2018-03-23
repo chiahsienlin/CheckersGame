@@ -63,11 +63,12 @@ void validate(Tile *temp, int c)
     }
     else
     {
-        //upclick the original chosen one
+        //unclick the original chosen one
         if(temp->tileNum==click1->tileNum){
             click1->tileDisplay();
             disOrange();
             exp.clear();
+            eat.clear();
             count=0;
             qDebug() << "Unclick";
         }
