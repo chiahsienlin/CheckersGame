@@ -3,6 +3,7 @@
 #include "tile.h"
 
 int count=0,turn=0;
+int remain_blk = 6, remain_wht = 6;
 std::vector<int> exp;
 std::vector<int> eat;
 Tile *click1;

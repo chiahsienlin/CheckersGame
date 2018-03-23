@@ -79,7 +79,6 @@ void validate(Tile *temp, int c)
                     if(!eat.empty()){
                         for(int x = 0; x < eat.size(); x++){
                             int tilenum = eat[x];
-                            qDebug() << x << ": "<< tilenum << endl;
                             int row_eat = tilenum/6;
                             int col_eat = tilenum%6;
                             int slope_des_start = (temp->row - click1->row)/(temp->col - click1->col);
@@ -89,6 +88,11 @@ void validate(Tile *temp, int c)
                                 qDebug() << "Eat!";
                                 tile[row_eat][col_eat]->piece=0;
                                 tile[row_eat][col_eat]->clear();
+                                if(tile[row_eat][col_eat]->pieceColor)
+                                    remain_wht--;
+                                else
+                                    remain_blk--;
+                                qDebug() << "white remains: " << remain_wht << "  black remains: " << remain_blk;
                             }
                         }
                         eat.clear();

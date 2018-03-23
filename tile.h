@@ -2,6 +2,7 @@
 #define TILE_H
 #include <QLabel>
 #include <QDebug>
+extern int remain_blk, remain_wht;
 
 class Tile: public QLabel
 {
