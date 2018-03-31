@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QDebug>
 extern int remain_blk, remain_wht;
+extern int cnt,turn;
+extern QWidget *myWidget;
 
 class Tile: public QLabel
 {
@@ -22,4 +24,6 @@ public:
     void tileDisplay();
 };
 
+extern Tile *click1;
+extern Tile *tile[6][6];
 #endif // TILE_H

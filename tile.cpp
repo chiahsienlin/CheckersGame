@@ -1,19 +1,16 @@
 #include "tile.h"
 #include "validation.h"
+#include "ai_player.h"
 
 validation *valid = new validation();
-
-extern int count,turn;
-extern QWidget *myWidget;
-extern Tile *click1;
-extern Tile *tile[6][6];
+AI_player *ai = new AI_player();
 
 void validate(Tile *temp,int c);
 void disOrange();
 
 void Tile::mousePressEvent(QMouseEvent *event)
 {
-    validate(this,++count);
+    validate(this,++cnt);
 }
 
 void Tile::display(char elem)
@@ -39,7 +36,7 @@ void validate(Tile *temp, int c)
 
     if(c==1)
     {
-        if(temp->piece && (temp->pieceColor==turn))
+        if(temp->piece && (temp->pieceColor==turn%2))
         {
             retValue=valid->chooser(temp);
 
@@ -51,14 +48,13 @@ void validate(Tile *temp, int c)
             }
             else
             {
-                //temp->setStyleSheet("QLabel {background-color: yello;}");
-                count=0;
+                cnt=0;
             }
         }
         else
         {
             qDebug()<<"Rascel, clicking anywhere";
-            count=0;
+            cnt=0;
         }
     }
     else
@@ -69,7 +65,7 @@ void validate(Tile *temp, int c)
             disOrange();
             exp.clear();
             eat.clear();
-            count=0;
+            cnt=0;
             qDebug() << "Unclick";
         }
         else{
@@ -109,17 +105,19 @@ void validate(Tile *temp, int c)
                     click1->tileDisplay();
                     temp->tileDisplay();
 
+                    ai->updateState(tile);
+                    ai->printState();
                     retValue=valid->check(click1);
 
                     disOrange();
 
                     exp.clear();
 
-                    turn=(turn+1)%2;
-                    count=0;
+                    turn++;
+                    cnt=0;
                 }
                 else
-                    count=1;
+                    cnt=1;
             }
         }
     }
@@ -135,9 +133,6 @@ void Tile::tileDisplay()
 
 void disOrange()
 {
-    int i;
-
-    for(i=0;i<exp.size();i++)
+    for(int i=0;i<exp.size();i++)
         tile[exp[i]/6][exp[i]%6]->tileDisplay();
-
 }

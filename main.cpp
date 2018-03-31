@@ -2,11 +2,11 @@
 #include "mainwindow.h"
 #include "tile.h"
 
-int count=0,turn=0;
+int cnt=0,turn=0;
 int remain_blk = 6, remain_wht = 6;
 std::vector<int> exp;
 std::vector<int> eat;
-Tile *click1;
+Tile *click1 = NULL;
 Tile *tile[6][6] = { { NULL } };
 
 class Border
@@ -51,7 +51,6 @@ void accessories(QWidget *baseWidget)
 
     moves->setGeometry(1000,105,250,550);
     moves->setStyleSheet("QLabel {background-color: white;}");
-
 }
 
 void chessBoard(QWidget *baseWidget, Tile *tile[6][6])

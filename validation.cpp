@@ -107,7 +107,6 @@ int validation::check(Tile *temp)
 
 void validation::orange()
 {
-    int i;
-    for(i=0;i<exp.size();i++)
+    for(int i=0;i<exp.size();i++)
         tile[exp[i]/6][exp[i]%6]->setStyleSheet("QLabel {background-color: yellow;}");
 }
