@@ -4,23 +4,53 @@
 #include <ctime>
 
 double duration;
-std::clock_t start;
 
 AI_player::AI_player(){
     State.resize(6, vector<int> (6,0));
 }
 
 void AI_player::AI_MainFunction(Tile *tile[6][6]){
-    std::clock_t start;
-    start = std::clock();
     Createstate(tile);
-    auto action = Alpha_Beta_Search(State);
-    auto newState = UpdateState(State, action);
-    UpdateStateToTile(newState, tile);
+    if(!Is_Terminal_State(State)){
+        start = std::clock();
+        if(!AI_Actions(State).empty()){
+            auto action = Alpha_Beta_Search(State);
+            auto newState = UpdateState(State, action);
+            UpdateStateToTile(newState, tile);
+            if(!Is_Terminal_State(newState)){
+                string msg ="Turn " + to_string(turn+1) + ": AI is done. It's your turn.";
+                moves->setText(msg.c_str());
+                turn++;
+            }
+            else{
+                qDebug() << "Terminate after AI's step.";
+                string msg = JudgeFunction(newState);
+                moves->setText(msg.c_str());
+            }
+        }
+        else{
+            string msg ="Turn " + to_string(turn+1) + ": AI can't move. Your turn!";
+            moves->setText(msg.c_str());
+            turn++;
+        }
+    }
+    else{
+        qDebug() << "Terminate after player's step.";
+        string msg = JudgeFunction(State);
+        moves->setText(msg.c_str());
+    }
+}
 
-    string str ="Turn" + to_string(turn+1) + ": AI is done. It's your turn.";
-    moves->setText(str.c_str());
-    turn++;
+string AI_player::JudgeFunction(vector<vector<int> > state) {
+    int val = Evaluation(state);
+    string msg;
+    if(val > 0)
+         msg = "Game Over. AI wins, you lose.";
+    else if(val == 0)
+         msg = "Game Over. Draw, no winner.";
+    else
+         msg = "Game Over. You win.";
+    return msg;
 }
 
 void AI_player::UpdateStateToTile(vector<vector<int>> state, Tile* tile[][6]){
@@ -108,8 +138,8 @@ bool AI_player::Is_Terminal_State(vector<vector<int>> state){
             else if(state[i][j] == -1) cntBlack++;
         }
     }
-    auto AI_acts = AI_Actions(this->State);
-    auto Pl_acts = Player_Actions(this->State);
+    auto AI_acts = AI_Actions(state);
+    auto Pl_acts = Player_Actions(state);
     if(cntBlack == 0) return true;
     else if(cntWhite == 0) return true;
     else if (AI_acts.empty() && Pl_acts.empty()) return true;
@@ -225,6 +255,8 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
     else if(level >= difficulty) return Evaluation(state);
     else if(duration >= responseTime) return Evaluation(state);
 
+    string t = to_string((int)(duration/3600))+ ":" +to_string((int)(duration/60)) + ":" + to_string((int)duration);
+    time2->setText(t.c_str());
     int val = INT_MIN;
     auto actions = AI_Actions(state);
     for(auto action: actions){
@@ -250,6 +282,8 @@ int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int lev
     else if(level >= difficulty) return Evaluation(state);
     else if(duration >= responseTime) return Evaluation(state);
 
+    string t = to_string((int)(duration/3600))+ ":" +to_string((int)(duration/60)) + ":" + to_string((int)duration);
+    time2->setText(t.c_str());
     int val = INT_MAX;
     auto actions = Player_Actions(state);
     for(auto action: actions){

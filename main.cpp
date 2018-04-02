@@ -4,41 +4,36 @@
 
 int cnt = 0,turn = 0;
 double responseTime = 15.00;
-int difficulty = 12;
+int difficulty = 14;
 std::vector<int> exp;
 std::vector<int> eat;
 Tile *click1 = NULL;
-Tile *tile[6][6] = { { NULL } };
+Tile *tile[6][6] = {{ NULL }};
 QLabel *moves;
+QLabel *time2;
 
 class Border{
 public:
     Border();
-    void outline(QWidget *baseWidget, int xPos, int yPos, int Pos)
-    {
+    void outline(QWidget *baseWidget, int xPos, int yPos, int Pos){
          QLabel *outLabel = new QLabel(baseWidget);
-
         if(!Pos)
             outLabel->setGeometry(xPos,yPos,552,20);        //Horizontal Borders
         else
             outLabel->setGeometry(xPos,yPos,20,512);        //Vertical Borders
-
         outLabel->setStyleSheet("QLabel { background-color :rgb(80, 50, 50); color : black; }");
     }
 };
 
 void accessories(QWidget *baseWidget){
-
     QLabel *player2 = new QLabel(baseWidget);
-    QLabel *name2 = new QLabel("Player 2", baseWidget);
-    QLabel *time2 = new QLabel("00:00:00", baseWidget);
+    QLabel *name2 = new QLabel("AI Player", baseWidget);
+    time2 = new QLabel("0:0:0", baseWidget);
 
     QLabel *player1 = new QLabel(baseWidget);
-    QLabel *name1 = new QLabel("Player 1", baseWidget);
-    QLabel *time1 = new QLabel("00:00:00", baseWidget);
+    QLabel *name1 = new QLabel("You", baseWidget);
 
     name1->setGeometry(125,610,80,20);
-    time1->setGeometry(120,635,80,20);
     player1->setGeometry(100,500,100,100);
     player1->setPixmap(QPixmap(":/Images/profile.png"));
 
@@ -53,14 +48,12 @@ void accessories(QWidget *baseWidget){
 }
 
 void chessBoard(QWidget *baseWidget, Tile *tile[6][6]){
-    int i,j,k=0,hor,ver;
-
+    int k=0,hor,ver;
     //Create 36 tiles (allocate memories to the objects of Tile class)
     ver=125;
-    for(i=0;i<6;i++){
+    for(int i=0;i<6;i++){
         hor=350;
-        for(j=0;j<6;j++)
-        {
+        for(int j=0;j<6;j++){
             tile[i][j] = new Tile(baseWidget);
             tile[i][j]->tileColor=(i+j)%2;
             tile[i][j]->piece=0;
@@ -73,7 +66,7 @@ void chessBoard(QWidget *baseWidget, Tile *tile[6][6]){
         }
         ver+=64;
     }
-    for(j = 0; j < 6; j++){
+    for(int j = 0; j < 6; j++){
         if(j%2 == 1){
             tile[0][j]->piece=1;
             tile[0][j]->pieceColor=1;
@@ -96,7 +89,6 @@ void chessBoard(QWidget *baseWidget, Tile *tile[6][6]){
 }
 
 int main(int argc, char *argv[]){
-
     QApplication a(argc, argv);
     QWidget *myWidget = new QWidget();
     myWidget->setGeometry(0,0,1370,700);

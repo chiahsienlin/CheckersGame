@@ -7,6 +7,8 @@ extern double responseTime;
 extern int difficulty;
 extern QWidget *myWidget;
 extern QLabel *moves;
+extern QLabel *time1;
+extern QLabel *time2;
 
 class Tile: public QLabel{
 public:

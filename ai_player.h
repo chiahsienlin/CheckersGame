@@ -8,6 +8,7 @@ class AI_player
 private:
     pair<pair<int,int>, pair<char, pair<int, int>>> BestAction;
     vector<vector<int>> State;
+    std::clock_t start;
 public:
     AI_player();
     void Createstate(Tile* tile[6][6]);
@@ -22,7 +23,7 @@ public:
     int Min_Value(vector<vector<int>> state, int alpha, int beta, int level);
     pair<pair<int,int>, pair<char, pair<int, int>>> Alpha_Beta_Search(vector<vector<int>> state);
     void UpdateStateToTile(vector<vector<int>> state, Tile* tile[][6]);
-
+    string JudgeFunction(vector<vector<int>> state);
     //--Main Function--
     void AI_MainFunction(Tile* tile[6][6]);
 };

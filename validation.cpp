@@ -1,7 +1,6 @@
 #include "validation.h"
 
 validation::validation(){
-    //Nothing here
 }
 
 int validation::chooser(Tile *temp){
@@ -12,13 +11,11 @@ int validation::chooser(Tile *temp){
 
 int validation::validatePawn(Tile *temp){
     int row,col;
-
     row=temp->row;
     col=temp->col;
     retVal=0;
     bool right_enemy = false;
     bool left_enemy = false;
-
     //Black(bottom)
     if(!temp->pieceColor){
         //upperleft have enemy
@@ -53,10 +50,10 @@ int validation::validatePawn(Tile *temp){
             exp.push_back(tile[row-1][col+1]->tileNum);
             retVal=1;
         }
-    }/*------------------- For 2P Game----------------------------------------
+    }
+    /*------------------- For 2P Game----------------------------------------
     //White(top)
-    else
-    {
+    else{
         //upperleft have enemy
         if(row+1<6 && col+1<6){
             if(tile[row+1][col+1]->piece && tile[row+1][col+1]->pieceColor == 0){

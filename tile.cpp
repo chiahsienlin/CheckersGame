@@ -10,28 +10,68 @@ void validate(Tile *temp,int c);
 void UpdateBoard(Tile *tile[6][6]);
 void disOrange();
 void AI_Start();
+void Player_Start(Tile *temp, int retValue);
 
-void Tile::mousePressEvent(QMouseEvent *event){
-    if(turn%2 == 0)
-        validate(this,++cnt);
+void AI_Start(){
+    ai->AI_MainFunction(tile);
+    UpdateBoard(tile);
 }
 
-void Tile::display(char elem){
-    this->pieceName=elem;
+void Player_Start(Tile *temp, int retValue){
+    for(int i=0;i<exp.size();i++){
+        if(temp->tileNum==exp[i]){
+            if(!eat.empty()){
+                for(int j = 0; j < eat.size(); j++){
+                    int tilenum = eat[j];
+                    int row_eat = tilenum/6;
+                    int col_eat = tilenum%6;
+                    int slope_des_start = (temp->row - click1->row)/(temp->col - click1->col);
+                    int slope_eat_start = (row_eat - click1->row)/(col_eat - click1->col);
 
-    if(this->pieceColor && this->piece){
-        this->setPixmap(QPixmap(":/Images/white.svg"));
+                    if(slope_des_start == slope_eat_start){
+                        tile[row_eat][col_eat]->piece=0;
+                        tile[row_eat][col_eat]->clear();
+                    }
+                }
+                eat.clear();
+            }
+            click1->piece=0;
+            temp->piece=1;
+            temp->pieceColor=click1->pieceColor;
+            temp->pieceName=click1->pieceName;
+            retValue=valid->check(click1);
+            disOrange();
+            exp.clear();
+            cnt=0;
+            turn++;
+
+            click1->display(click1->pieceName);
+            temp->display(click1->pieceName);
+            click1->tileDisplay();
+            temp->tileDisplay();
+
+            ai->Createstate(tile);
+            if(!ai->Is_Terminal_State(ai->getState())){
+                if(turn%2 == 1){
+                    std::thread th1(AI_Start);
+                    th1.detach();
+                }
+            }
+            else{
+                qDebug() << "Terminate after Player's step.";
+                string msg = ai->JudgeFunction(ai->getState());
+                moves->setText(msg.c_str());
+            }
+        }
+        else
+            cnt=1;
     }
-    else if(this->piece){
-        this->setPixmap(QPixmap(":/Images/black.svg"));
-    }
-    else
-        this->clear();
 }
 
 void validate(Tile *temp, int c){
     int retValue;
-    if(c==1){
+    //First click
+    if(c == 1){
         if(temp->piece){
             retValue=valid->chooser(temp);
             if(retValue){
@@ -39,17 +79,14 @@ void validate(Tile *temp, int c){
                 temp->setStyleSheet("QLabel {background-color: orange;}");
                 click1=temp;
             }
-            else{
+            else
                 cnt=0;
-            }
         }
-        else{
-            //qDebug()<<"Click anywhere else.";
+        else
             cnt=0;
-        }
     }
     else{
-        //unclick the original chosen one
+        //Unclick the original chosen one
         if(temp->tileNum==click1->tileNum){
             click1->tileDisplay();
             disOrange();
@@ -58,45 +95,21 @@ void validate(Tile *temp, int c){
             cnt=0;
         }
         else{
-            for(int i=0;i<exp.size();i++){
-                if(temp->tileNum==exp[i]){
-                    if(!eat.empty()){
-                        for(int j = 0; j < eat.size(); j++){
-                            int tilenum = eat[j];
-                            int row_eat = tilenum/6;
-                            int col_eat = tilenum%6;
-                            int slope_des_start = (temp->row - click1->row)/(temp->col - click1->col);
-                            int slope_eat_start = (row_eat - click1->row)/(col_eat - click1->col);
-
-                            if(slope_des_start == slope_eat_start){
-                                tile[row_eat][col_eat]->piece=0;
-                                tile[row_eat][col_eat]->clear();
-                            }
-                        }
-                        eat.clear();
-                    }
-                    click1->piece=0;
-                    temp->piece=1;
-                    temp->pieceColor=click1->pieceColor;
-                    temp->pieceName=click1->pieceName;
-                    retValue=valid->check(click1);
-                    disOrange();
-                    exp.clear();
-                    cnt=0;
-                    turn++;
-
-                    click1->display(click1->pieceName);
-                    temp->display(click1->pieceName);
-                    click1->tileDisplay();
-                    temp->tileDisplay();
-
-                    if(turn%2 == 1){
-                        std::thread th1(AI_Start);
-                        th1.detach();
-                    }
+            ai->Createstate(tile);
+            if(!ai->Is_Terminal_State(ai->getState())){
+                if(!ai->Player_Actions(ai->getState()).empty()){
+                   Player_Start(temp, retValue);
                 }
-                else
-                    cnt=1;
+                else{
+                    string msg ="Turn " + to_string(turn+1) + ": You can't move. AI's turn!";
+                    moves->setText(msg.c_str());
+                    turn++;
+                }
+            }
+            else{
+                qDebug() << "Terminate after AI's step.";
+                string msg = ai->JudgeFunction(ai->getState());
+                moves->setText(msg.c_str());
             }
         }
     }
@@ -130,7 +143,19 @@ void UpdateBoard(Tile *tile[6][6]){
     }
 }
 
-void AI_Start(){
-    ai->AI_MainFunction(tile);
-    UpdateBoard(tile);
+void Tile::mousePressEvent(QMouseEvent *event){
+    if(turn%2 == 0)
+        validate(this,++cnt);
+}
+
+void Tile::display(char elem){
+    this->pieceName=elem;
+    if(this->pieceColor && this->piece){
+        this->setPixmap(QPixmap(":/Images/white.svg"));
+    }
+    else if(this->piece){
+        this->setPixmap(QPixmap(":/Images/black.svg"));
+    }
+    else
+        this->clear();
 }
