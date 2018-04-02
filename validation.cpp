@@ -56,7 +56,7 @@ int validation::validatePawn(Tile *temp)
             exp.push_back(tile[row-1][col+1]->tileNum);
             retVal=1;
         }
-    }
+    }/*------------------- For 2P Game----------------------------------------
     //White(top)
     else
     {
@@ -66,7 +66,7 @@ int validation::validatePawn(Tile *temp)
                 if(row+2<6 && col+2<6 && !tile[row+2][col+2]->piece){
                     exp.push_back(tile[row+2][col+2]->tileNum);
                     eat.push_back(tile[row+1][col+1]->tileNum);
-                    qDebug() << "Add left enemy.   vector size = " << eat.size();
+                    //qDebug() << "Add left enemy.   vector size = " << eat.size();
                     retVal=1;
                     left_enemy=true;
                 }
@@ -78,7 +78,7 @@ int validation::validatePawn(Tile *temp)
                 if(row+2<6 && col-2 >= 0 && !tile[row+2][col-2]->piece){
                     exp.push_back(tile[row+2][col-2]->tileNum);
                     eat.push_back(tile[row+1][col-1]->tileNum);
-                    qDebug() << "Add right enemy.   vector size = " << eat.size();
+                    //qDebug() << "Add right enemy.   vector size = " << eat.size();
                     retVal=1;
                     right_enemy=true;
                 }
@@ -95,7 +95,7 @@ int validation::validatePawn(Tile *temp)
             exp.push_back(tile[row+1][col-1]->tileNum);
             retVal=1;
         }
-    }
+    }*/
     return retVal;
 }
 

@@ -10,7 +10,24 @@ void disOrange();
 
 void Tile::mousePressEvent(QMouseEvent *event)
 {
-    validate(this,++cnt);
+    if(turn%2 == 0)
+        validate(this,++cnt);
+}
+
+void UpdateBoard(Tile *tile[6][6]){
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < 6; j++){
+            if(tile[i][j]->piece){
+                if(tile[i][j]->pieceColor)
+                    tile[i][j]->display('W');
+                else
+                    tile[i][j]->display('B');
+            }
+            else{
+                tile[i][j]->display('N');
+            }
+        }
+    }
 }
 
 void Tile::display(char elem)
@@ -36,7 +53,7 @@ void validate(Tile *temp, int c)
 
     if(c==1)
     {
-        if(temp->piece && (temp->pieceColor==turn%2))
+        if(temp->piece) //&& (temp->pieceColor==turn%2)
         {
             retValue=valid->chooser(temp);
 
@@ -53,7 +70,7 @@ void validate(Tile *temp, int c)
         }
         else
         {
-            qDebug()<<"Rascel, clicking anywhere";
+            //qDebug()<<"Click anywhere else.";
             cnt=0;
         }
     }
@@ -66,10 +83,10 @@ void validate(Tile *temp, int c)
             exp.clear();
             eat.clear();
             cnt=0;
-            qDebug() << "Unclick";
+            //qDebug() << "Unclick";
         }
         else{
-            qDebug() << "Move";
+            //qDebug() << "Move";
             for(i=0;i<exp.size();i++){
                 if(temp->tileNum==exp[i]){
                     if(!eat.empty()){
@@ -81,7 +98,7 @@ void validate(Tile *temp, int c)
                             int slope_eat_start = (row_eat - click1->row)/(col_eat - click1->col);
 
                             if(slope_des_start == slope_eat_start){
-                                qDebug() << "Eat!";
+                                //qDebug() << "Eat!";
                                 tile[row_eat][col_eat]->piece=0;
                                 tile[row_eat][col_eat]->clear();
                                 if(tile[row_eat][col_eat]->pieceColor)
@@ -104,17 +121,16 @@ void validate(Tile *temp, int c)
 
                     click1->tileDisplay();
                     temp->tileDisplay();
-
-                    ai->updateState(tile);
-                    ai->printState();
                     retValue=valid->check(click1);
-
                     disOrange();
-
                     exp.clear();
-
-                    turn++;
                     cnt=0;
+                    turn++;
+
+                    if(turn%2 == 1){
+                        ai->AI_MainFunction(tile);
+                        UpdateBoard(tile);
+                    }
                 }
                 else
                     cnt=1;

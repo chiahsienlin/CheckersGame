@@ -4,6 +4,8 @@
 #include <QDebug>
 extern int remain_blk, remain_wht;
 extern int cnt,turn;
+extern double responseTime;
+extern int difficulty;
 extern QWidget *myWidget;
 
 class Tile: public QLabel
