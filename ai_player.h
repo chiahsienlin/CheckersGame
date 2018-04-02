@@ -21,7 +21,6 @@ public:
     int Max_Value(vector<vector<int>> state, int alpha, int beta, int level);
     int Min_Value(vector<vector<int>> state, int alpha, int beta, int level);
     pair<pair<int,int>, pair<char, pair<int, int>>> Alpha_Beta_Search(vector<vector<int>> state);
-    pair<pair<int,int>, pair<char, pair<int, int>>> getActionbyValue(vector<vector<int>> state, int value);
     void UpdateStateToTile(vector<vector<int>> state, Tile* tile[][6]);
 
     //--Main Function--

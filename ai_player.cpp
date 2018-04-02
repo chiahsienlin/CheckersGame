@@ -16,11 +16,9 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
     Createstate(tile);
     auto action = Alpha_Beta_Search(State);
     auto newState = UpdateState(State, action);
-    printState(newState);
     UpdateStateToTile(newState, tile);
     qDebug() << "AI is done.";
     turn++;
-    return;
 }
 
 void AI_player::UpdateStateToTile(vector<vector<int>> state, Tile* tile[][6]){
@@ -39,7 +37,6 @@ void AI_player::UpdateStateToTile(vector<vector<int>> state, Tile* tile[][6]){
             }
         }
     }
-    return;
 }
 
 void AI_player::Createstate(Tile* tile[6][6]){
@@ -56,8 +53,6 @@ void AI_player::Createstate(Tile* tile[6][6]){
             }
         }
     }
-    //qDebug() << "Create State";
-    return;
 }
 
 vector<vector<int>> AI_player::UpdateState(vector<vector<int>> state, pair<pair<int,int>, pair<char, pair<int, int>>> action){
@@ -69,12 +64,10 @@ vector<vector<int>> AI_player::UpdateState(vector<vector<int>> state, pair<pair<
     int tmp = state[before_x][before_y];
 
     if(action_type == 'm'){
-        //qDebug() << "AI Move";
         state[before_x][before_y] = 0;
         state[after_x][after_y] = tmp;
     }
     else if(action_type == 'e'){
-        //qDebug() << "AI Eat";
         int mid_x = (before_x + after_x)/2;
         int mid_y = (before_y + after_y)/2;
         state[before_x][before_y] = 0;
@@ -83,9 +76,7 @@ vector<vector<int>> AI_player::UpdateState(vector<vector<int>> state, pair<pair<
     }
     else{
        qDebug() << "[error] : Undefined actions type.";
-       qDebug() << "Action type: " << action_type << ", value = "<< tmp << before_x << ","<< before_y << "=>" << after_x << "," << after_y;
     }
-
     return state;
 }
 
@@ -136,7 +127,6 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                         if(row+2<6 && col+2<6 && state[row+2][col+2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row+2, col+2)));
                             actions.push_back(action);
-                            qDebug() << "AI add the left eat (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                             left_enemy=true;
                         }
                     }
@@ -147,7 +137,6 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                         if(row+2<6 && col-2 >= 0 && state[row+2][col-2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row+2, col-2)));
                             actions.push_back(action);
-                            qDebug() << "AI add the right eat (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                             right_enemy=true;
                         }
                     }
@@ -156,7 +145,6 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                 if(!right_enemy && row+1<6 && col+1<6 && state[row+1][col+1] == 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row+1, col+1)));
                     actions.push_back(action);
-                    //qDebug() << "AI add the left move (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                 }
 
                 //upperright is empty and there is no enemy on the right
@@ -184,7 +172,6 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
                         if(row-2 >=0 && col-2 >= 0 && state[row-2][col-2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row-2, col-2)));
                             actions.push_back(action);
-                            //qDebug() << "Player add the left eat (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                             left_enemy=true;
                         }
                     }
@@ -195,7 +182,6 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
                         if(row-2>=0 && col+2 < 6 && state[row-2][col+2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row-2, col+2)));
                             actions.push_back(action);
-                            //qDebug() << "Player add the right eat (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                             right_enemy=true;
                         }
                     }
@@ -204,14 +190,11 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
                 if(!right_enemy && row-1 >= 0 && col-1 >= 0 && state[row-1][col-1] == 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row-1, col-1)));
                     actions.push_back(action);
-                    //qDebug() << "Player add the left move (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                 }
-
                 //upperright is empty and there is no enemy on the right
                 if(!left_enemy && row-1 >= 0 && col+1 <6 && state[row-1][col+1]== 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row-1, col+1)));
                     actions.push_back(action);
-                    //qDebug() << "Player add the right move (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                 }
             }
         }
@@ -230,17 +213,6 @@ int AI_player::Evaluation(vector<vector<int>> state){
     return (cntWhite - cntBlack);
 }
 
-pair<pair<int,int>, pair<char, pair<int, int>>> AI_player::getActionbyValue(vector<vector<int>> state, int value){
-    auto actions = AI_Actions(state);
-    qDebug() << "Need to find the action with value" << value;
-    for(auto action: actions){
-        if(Evaluation(UpdateState(state, action)) == value)
-            return action;
-    }
-    qDebug() << "Action with " << value << " not found.";
-    return pair<pair<int,int>, pair<char, pair<int, int>>>();
-}
-
 pair<pair<int,int>, pair<char, pair<int, int>>> AI_player::Alpha_Beta_Search(vector<vector<int>> state){
     BestAction = AI_Actions(state)[rand()%2];
     int val = Max_Value(state, INT_MIN, INT_MAX, 0);
@@ -249,7 +221,6 @@ pair<pair<int,int>, pair<char, pair<int, int>>> AI_player::Alpha_Beta_Search(vec
 
 int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int level){
     duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    qDebug() << "Duration: " << duration << ", level: " << level;
     if(Is_Terminal_State(state)) return Evaluation(state);
     else if(level >= difficulty) return Evaluation(state);
     else if(duration >= responseTime) return Evaluation(state);
@@ -263,7 +234,7 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
             if(level == 0){
                 alpha = val;
                 BestAction = action;
-                qDebug() << "Best Action (" << BestAction.first.first << "," << BestAction.first.second << ")" << ", ("<< BestAction.second.first <<", " << BestAction.second.second.first << "," << BestAction.second.second.second << "))";
+                qDebug() << "[+] Best Action (" << BestAction.first.first << "," << BestAction.first.second << ")" << ", ("<< BestAction.second.first <<", " << BestAction.second.second.first << "," << BestAction.second.second.second << "))";
             }
             else{
                 alpha = val;
@@ -275,7 +246,6 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
 
 int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int level){
     duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    qDebug() << "Duration: " << duration << ", level: " << level << ", difficulty: " << difficulty;
     if(Is_Terminal_State(state)) return Evaluation(state);
     else if(level >= difficulty) return Evaluation(state);
     else if(duration >= responseTime) return Evaluation(state);

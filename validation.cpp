@@ -1,19 +1,16 @@
 #include "validation.h"
 
-validation::validation()
-{
+validation::validation(){
     //Nothing here
 }
 
-int validation::chooser(Tile *temp)
-{
+int validation::chooser(Tile *temp){
     flag=validatePawn(temp);
     orange();
     return flag;
 }
 
-int validation::validatePawn(Tile *temp)
-{
+int validation::validatePawn(Tile *temp){
     int row,col;
 
     row=temp->row;
@@ -21,9 +18,9 @@ int validation::validatePawn(Tile *temp)
     retVal=0;
     bool right_enemy = false;
     bool left_enemy = false;
+
     //Black(bottom)
-    if(!temp->pieceColor)
-    {
+    if(!temp->pieceColor){
         //upperleft have enemy
         if(row-1 >= 0 && col-1 >= 0){
             if(tile[row-1][col-1]->piece && tile[row-1][col-1]->pieceColor == 1){
@@ -99,14 +96,12 @@ int validation::validatePawn(Tile *temp)
     return retVal;
 }
 
-int validation::check(Tile *temp)
-{
+int validation::check(Tile *temp){
     retVal=0;
     return retVal;
 }
 
-void validation::orange()
-{
+void validation::orange(){
     for(int i=0;i<exp.size();i++)
         tile[exp[i]/6][exp[i]%6]->setStyleSheet("QLabel {background-color: yellow;}");
 }
