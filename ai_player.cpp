@@ -17,7 +17,9 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
     auto action = Alpha_Beta_Search(State);
     auto newState = UpdateState(State, action);
     UpdateStateToTile(newState, tile);
-    qDebug() << "AI is done.";
+
+    string str ="Turn" + to_string(turn+1) + ": AI is done. It's your turn.";
+    moves->setText(str.c_str());
     turn++;
 }
 
@@ -121,7 +123,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
     for(int row = 0; row < 6; row++){
         for(int col = 0 ; col < 6; col++){
             if(state[row][col] == 1){
-                //upperleft have enemy
+                //upperleft enemy
                 if(row+1<6 && col+1<6){
                     if(state[row+1][col+1] == -1){
                         if(row+2<6 && col+2<6 && state[row+2][col+2] == 0){
@@ -131,7 +133,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                         }
                     }
                 }
-                //upperright have enemy
+                //upperright enemy
                 if(row+1<6 && col-1 >= 0){
                     if(state[row+1][col-1] == -1){
                         if(row+2<6 && col-2 >= 0 && state[row+2][col-2] == 0){
@@ -146,12 +148,10 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row+1, col+1)));
                     actions.push_back(action);
                 }
-
                 //upperright is empty and there is no enemy on the right
                 if(!left_enemy && row+1<6 && col-1 >= 0 && state[row+1][col-1]== 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row+1, col-1)));
                     actions.push_back(action);
-                    //qDebug() << "AI add the right move (" << action.first.first << "," << action.first.second << ")" << ", ("<< action.second.first <<", " << action.second.second.first << "," << action.second.second.second << "))";
                 }
             }
         }
@@ -166,7 +166,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
     for(int row = 0; row < 6; row++){
         for(int col = 0 ; col < 6; col++){
             if(state[row][col] == -1){
-                //upperleft have enemy
+                //upperleft enemy
                 if(row-1 >= 0 && col-1 >= 0){
                     if(state[row-1][col-1] == 1){
                         if(row-2 >=0 && col-2 >= 0 && state[row-2][col-2] == 0){
@@ -176,7 +176,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
                         }
                     }
                 }
-                //upperright have enemy
+                //upperright enemy
                 if(row-1 >= 0 && col+1 <6){
                     if(state[row-1][col+1] == 1){
                         if(row-2>=0 && col+2 < 6 && state[row-2][col+2] == 0){

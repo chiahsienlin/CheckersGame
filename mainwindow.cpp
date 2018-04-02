@@ -8,14 +8,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
 }
 
-
-void MainWindow::on_pushButton_clicked()
-{
+void MainWindow::on_pushButton_clicked(){
 
 }
 

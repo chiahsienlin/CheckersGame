@@ -7,42 +7,23 @@ validation *valid = new validation();
 AI_player *ai = new AI_player();
 
 void validate(Tile *temp,int c);
+void UpdateBoard(Tile *tile[6][6]);
 void disOrange();
+void AI_Start();
 
 void Tile::mousePressEvent(QMouseEvent *event){
     if(turn%2 == 0)
         validate(this,++cnt);
 }
 
-void UpdateBoard(Tile *tile[6][6]){
-    for(int i = 0; i < 6; i++){
-        for(int j = 0; j < 6; j++){
-            if(tile[i][j]->piece){
-                if(tile[i][j]->pieceColor)
-                    tile[i][j]->display('W');
-                else
-                    tile[i][j]->display('B');
-            }
-            else{
-                tile[i][j]->display('N');
-            }
-        }
-    }
-}
-
-void AI_Start(){
-    ai->AI_MainFunction(tile);
-    UpdateBoard(tile);
-}
-
 void Tile::display(char elem){
     this->pieceName=elem;
 
     if(this->pieceColor && this->piece){
-        this->setPixmap(QPixmap(":/Images/pawn_white.svg"));
+        this->setPixmap(QPixmap(":/Images/white.svg"));
     }
     else if(this->piece){
-        this->setPixmap(QPixmap(":/Images/pawn_black.svg"));
+        this->setPixmap(QPixmap(":/Images/black.svg"));
     }
     else
         this->clear();
@@ -50,7 +31,6 @@ void Tile::display(char elem){
 
 void validate(Tile *temp, int c){
     int retValue;
-
     if(c==1){
         if(temp->piece){
             retValue=valid->chooser(temp);
@@ -132,4 +112,25 @@ void Tile::tileDisplay(){
 void disOrange(){
     for(int i=0;i<exp.size();i++)
         tile[exp[i]/6][exp[i]%6]->tileDisplay();
+}
+
+void UpdateBoard(Tile *tile[6][6]){
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < 6; j++){
+            if(tile[i][j]->piece){
+                if(tile[i][j]->pieceColor)
+                    tile[i][j]->display('W');
+                else
+                    tile[i][j]->display('B');
+            }
+            else{
+                tile[i][j]->display('N');
+            }
+        }
+    }
+}
+
+void AI_Start(){
+    ai->AI_MainFunction(tile);
+    UpdateBoard(tile);
 }

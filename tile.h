@@ -6,6 +6,7 @@ extern int cnt,turn;
 extern double responseTime;
 extern int difficulty;
 extern QWidget *myWidget;
+extern QLabel *moves;
 
 class Tile: public QLabel{
 public:
