@@ -4,8 +4,8 @@
 
 int cnt = 0,turn = 0;
 double responseTime = 15.00;
-int difficulty = 14;
-std::vector<int> exp;
+int difficulty = 16;
+std::vector<int> valid_mv;
 std::vector<int> eat;
 Tile *click1 = NULL;
 Tile *tile[6][6] = {{ NULL }};
@@ -25,10 +25,23 @@ public:
     }
 };
 
+void accessories(QWidget *baseWidget);
+void chessBoard(QWidget *baseWidget, Tile *tile[6][6]);
+
+int main(int argc, char *argv[]){
+    QApplication a(argc, argv);
+    QWidget *myWidget = new QWidget();
+    myWidget->setGeometry(0,0,1370,700);
+    accessories(myWidget);
+    chessBoard(myWidget,tile);
+    myWidget->show();
+    return a.exec();
+}
+
 void accessories(QWidget *baseWidget){
     QLabel *player2 = new QLabel(baseWidget);
     QLabel *name2 = new QLabel("AI Player", baseWidget);
-    time2 = new QLabel("0:0:0", baseWidget);
+    time2 = new QLabel("0 sec", baseWidget);
 
     QLabel *player1 = new QLabel(baseWidget);
     QLabel *name1 = new QLabel("You", baseWidget);
@@ -87,14 +100,3 @@ void chessBoard(QWidget *baseWidget, Tile *tile[6][6]){
         }
     }
 }
-
-int main(int argc, char *argv[]){
-    QApplication a(argc, argv);
-    QWidget *myWidget = new QWidget();
-    myWidget->setGeometry(0,0,1370,700);
-    accessories(myWidget);
-    chessBoard(myWidget,tile);
-    myWidget->show();
-    return a.exec();
-}
-

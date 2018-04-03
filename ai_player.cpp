@@ -2,11 +2,13 @@
 #include "tile.h"
 #include <QDebug>
 #include <ctime>
+#include <thread>
 
 double duration;
 
 AI_player::AI_player(){
     State.resize(6, vector<int> (6,0));
+    AI_Has_No_Move = false;
 }
 
 void AI_player::AI_MainFunction(Tile *tile[6][6]){
@@ -20,7 +22,23 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
             if(!Is_Terminal_State(newState)){
                 string msg ="Turn " + to_string(turn+1) + ": AI is done. It's your turn.";
                 moves->setText(msg.c_str());
-                turn++;
+                if(!Player_Actions(newState).empty())
+                    turn++;
+                else{
+                    string msg ="Turn " + to_string(turn+1) + ": You can't move. AI's turn!";
+                    moves->setText(msg.c_str());
+                    while(!AI_Actions(newState).empty()){
+                        msg = "AI Player is moving ....";
+                        moves->setText(msg.c_str());
+                        action = Alpha_Beta_Search(newState);
+                        newState = UpdateState(newState, action);
+                        UpdateStateToTile(newState, tile);
+                        std::this_thread::sleep_for (std::chrono::seconds(1));
+                        UpdateBoard(tile);
+                    }
+                    msg = JudgeFunction(newState);
+                    moves->setText(msg.c_str());
+                }
             }
             else{
                 qDebug() << "Terminate after AI's step.";
@@ -31,7 +49,11 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
         else{
             string msg ="Turn " + to_string(turn+1) + ": AI can't move. Your turn!";
             moves->setText(msg.c_str());
-            turn++;
+            if(!AI_Has_No_Move){
+                qDebug() << "!!";
+                turn++;
+                AI_Has_No_Move = true;
+            }
         }
     }
     else{
@@ -42,7 +64,16 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
 }
 
 string AI_player::JudgeFunction(vector<vector<int> > state) {
-    int val = Evaluation(state);
+    int Blackcnt = 0, Whitecnt = 0;
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < 6; j++){
+            if(state[i][j] == 1)
+                Whitecnt++;
+            else if(state[i][j] == -1)
+                Blackcnt++;
+        }
+    }
+    int val = Whitecnt - Blackcnt;
     string msg;
     if(val > 0)
          msg = "Game Over. AI wins, you lose.";
@@ -148,8 +179,7 @@ bool AI_player::Is_Terminal_State(vector<vector<int>> state){
 
 vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(vector<vector<int>> state){
     vector<pair<pair<int,int>, pair<char, pair<int, int>>>> actions;
-    bool left_enemy = false;
-    bool right_enemy = false;
+    bool ForceJump = false;
     for(int row = 0; row < 6; row++){
         for(int col = 0 ; col < 6; col++){
             if(state[row][col] == 1){
@@ -159,7 +189,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                         if(row+2<6 && col+2<6 && state[row+2][col+2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row+2, col+2)));
                             actions.push_back(action);
-                            left_enemy=true;
+                            ForceJump=true;
                         }
                     }
                 }
@@ -169,20 +199,29 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
                         if(row+2<6 && col-2 >= 0 && state[row+2][col-2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row+2, col-2)));
                             actions.push_back(action);
-                            right_enemy=true;
+                            ForceJump=true;
                         }
                     }
                 }
-                //upperleft is empty and there is no enemy on the right
-                if(!right_enemy && row+1<6 && col+1<6 && state[row+1][col+1] == 0){
+                //Force Jump or move to left empty tile
+                if(!ForceJump && row+1<6 && col+1<6 && state[row+1][col+1] == 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row+1, col+1)));
                     actions.push_back(action);
                 }
-                //upperright is empty and there is no enemy on the right
-                if(!left_enemy && row+1<6 && col-1 >= 0 && state[row+1][col-1]== 0){
+                //Force Jump or move to right empty tile
+                if(!ForceJump && row+1<6 && col-1 >= 0 && state[row+1][col-1]== 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row+1, col-1)));
                     actions.push_back(action);
                 }
+            }
+        }
+    }
+    //Force Jump Check
+    if(ForceJump){
+        for(int i = 0; i < actions.size(); i++){
+            if(actions[i].second.first == 'm'){
+                actions.erase(actions.begin()+i);
+                i--;
             }
         }
     }
@@ -191,8 +230,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::AI_Actions(ve
 
 vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Actions(vector<vector<int>> state){
     vector<pair<pair<int,int>, pair<char, pair<int, int>>>> actions;
-    bool left_enemy = false;
-    bool right_enemy = false;
+    bool ForceJump = false;
     for(int row = 0; row < 6; row++){
         for(int col = 0 ; col < 6; col++){
             if(state[row][col] == -1){
@@ -202,7 +240,7 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
                         if(row-2 >=0 && col-2 >= 0 && state[row-2][col-2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row-2, col-2)));
                             actions.push_back(action);
-                            left_enemy=true;
+                            ForceJump=true;
                         }
                     }
                 }
@@ -212,20 +250,29 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
                         if(row-2>=0 && col+2 < 6 && state[row-2][col+2] == 0){
                             auto action = make_pair( make_pair(row,col), make_pair('e', make_pair(row-2, col+2)));
                             actions.push_back(action);
-                            right_enemy=true;
+                            ForceJump=true;
                         }
                     }
                 }
                 //upperleft is empty and there is no enemy on the right
-                if(!right_enemy && row-1 >= 0 && col-1 >= 0 && state[row-1][col-1] == 0){
+                if(!ForceJump && row-1 >= 0 && col-1 >= 0 && state[row-1][col-1] == 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row-1, col-1)));
                     actions.push_back(action);
                 }
                 //upperright is empty and there is no enemy on the right
-                if(!left_enemy && row-1 >= 0 && col+1 <6 && state[row-1][col+1]== 0){
+                if(!ForceJump && row-1 >= 0 && col+1 <6 && state[row-1][col+1]== 0){
                     auto action = make_pair( make_pair(row,col), make_pair('m', make_pair(row-1, col+1)));
                     actions.push_back(action);
                 }
+            }
+        }
+    }
+    //Force Jump Check
+    if(ForceJump){
+        for(int i = 0; i < actions.size(); i++){
+            if(actions[i].second.first == 'm'){
+                actions.erase(actions.begin()+i);
+                i--;
             }
         }
     }
@@ -234,13 +281,32 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
 
 int AI_player::Evaluation(vector<vector<int>> state){
     int cntBlack = 0, cntWhite = 0;
+    int whiteBound = 0, BlackBound = 5;
+    int safeBlack = 0, safeWhite = 0;
     for(int i = 0; i < 6; i++){
         for(int j = 0; j < 6; j++){
-            if(state[i][j] == 1) cntWhite++;
-            else if(state[i][j] == -1) cntBlack++;
+            if(state[i][j] == 1){
+                whiteBound = min(whiteBound, i);
+                cntWhite++;
+            }
+            else if(state[i][j] == -1){
+                BlackBound = max(BlackBound, i);
+                cntBlack++;
+            }
         }
     }
-    return (cntWhite - cntBlack);
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < 6; j++){
+            if(state[i][j] == 1 && i >= BlackBound){
+               safeWhite++;
+            }
+            else if(state[i][j] == -1 && i <= whiteBound){
+                safeBlack++;
+            }
+        }
+    }
+    int res = (cntWhite - cntBlack)*2 + (safeWhite - safeBlack);
+    return res;
 }
 
 pair<pair<int,int>, pair<char, pair<int, int>>> AI_player::Alpha_Beta_Search(vector<vector<int>> state){
@@ -255,7 +321,7 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
     else if(level >= difficulty) return Evaluation(state);
     else if(duration >= responseTime) return Evaluation(state);
 
-    string t = to_string((int)(duration/3600))+ ":" +to_string((int)(duration/60)) + ":" + to_string((int)duration);
+    string t = to_string((int)duration) + " sec";
     time2->setText(t.c_str());
     int val = INT_MIN;
     auto actions = AI_Actions(state);
@@ -282,7 +348,7 @@ int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int lev
     else if(level >= difficulty) return Evaluation(state);
     else if(duration >= responseTime) return Evaluation(state);
 
-    string t = to_string((int)(duration/3600))+ ":" +to_string((int)(duration/60)) + ":" + to_string((int)duration);
+    string t = to_string((int)duration) + " sec";
     time2->setText(t.c_str());
     int val = INT_MAX;
     auto actions = Player_Actions(state);

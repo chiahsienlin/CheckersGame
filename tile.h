@@ -2,6 +2,7 @@
 #define TILE_H
 #include <QLabel>
 #include <QDebug>
+
 extern int cnt,turn;
 extern double responseTime;
 extern int difficulty;
@@ -22,6 +23,7 @@ public:
     void tileDisplay();
 };
 
+extern void UpdateBoard(Tile *tile[6][6]);
 extern Tile *click1;
 extern Tile *tile[6][6];
 #endif // TILE_H
