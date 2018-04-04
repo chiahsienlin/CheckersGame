@@ -1,5 +1,4 @@
 #include <QApplication>
-#include <QtGui>
 #include <QInputDialog>
 #include <QMessageBox>
 #include "mainwindow.h"
@@ -7,9 +6,6 @@
 #include "validation.h"
 #include "ai_player.h"
 #include <thread>
-using namespace std;
-QTextStream cout(stdout);
-QTextStream cin(stdin);
 
 int cnt = 0,turn = 0;
 double responseTime = 15.00;
@@ -51,28 +47,27 @@ int main(int argc, char *argv[]){
     do{
         QInputDialog dialog;
         level = dialog.getInt(0, "Difficulty 1 to 5", "level", 1,1,5);
-        cout << "User entered: " << level << endl;
         QString response = QString("The Level you choose is %1.\n").arg(level);
         answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No);
     }while(answer == QMessageBox::No);
     do{
         QInputDialog dialog;
         turn = dialog.getInt(0, "Who first?", "0. You first  1. AI first", 0,0,1);
-        cout << "User entered: " << level << endl;
         QString response;
         if(!turn)
-            response= QString("You choose You first.\n").arg(turn);
+            response= QString("You choose You first.");
         else
-            response = QString("You choose AI first.\n").arg(turn);
+            response = QString("You choose AI first.");
         answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No);
     }while(answer == QMessageBox::No);
     difficulty = level*3 + 1;
-    myWidget->show();
+    std::thread th_m;
     if(turn){
-        thread th(AI_StartFirst);
-        th.detach();
+        th_m = std::thread(AI_StartFirst);
+        th_m.detach();
         turn++;
     }
+    myWidget->show();
     return a.exec();
 }
 
@@ -83,6 +78,7 @@ void AI_StartFirst(){
     ai->UpdateStateToTile(newState, tile);
     UpdateBoard(tile);
 }
+
 void accessories(QWidget *baseWidget){
     QLabel *player2 = new QLabel(baseWidget);
     QLabel *name2 = new QLabel("AI Player", baseWidget);
@@ -106,12 +102,12 @@ void accessories(QWidget *baseWidget){
 }
 
 void chessBoard(QWidget *baseWidget, Tile *tile[6][6]){
-    int k=0,hor,ver;
+    int k = 0,hor,ver;
     //Create 36 tiles (allocate memories to the objects of Tile class)
-    ver=125;
-    for(int i=0;i<6;i++){
-        hor=350;
-        for(int j=0;j<6;j++){
+    ver = 125;
+    for(int i = 0; i < 6; i++){
+        hor = 350;
+        for(int j = 0; j < 6; j++){
             tile[i][j] = new Tile(baseWidget);
             tile[i][j]->tileColor=(i+j)%2;
             tile[i][j]->piece=0;

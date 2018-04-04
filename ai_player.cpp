@@ -12,7 +12,6 @@ AI_player::AI_player(){
 void AI_player::AI_MainFunction(Tile *tile[6][6]){
     Createstate(tile);
     if(!Is_Terminal_State(State)){
-        start = std::clock();
         if(!AI_Actions(State).empty()){
             auto action = Alpha_Beta_Search(State);
             auto newState = UpdateState(State, action);
@@ -38,7 +37,6 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
                 }
             }
             else{
-                qDebug() << "Terminate after AI's step.";
                 string msg = JudgeFunction(newState);
                 moves->setText(msg.c_str());
             }
@@ -47,11 +45,9 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
             string msg ="Turn " + to_string(turn+1) + ": AI can't move. Your turn!";
             moves->setText(msg.c_str());
             turn++;
-            qDebug() << turn;
         }
     }
     else{
-        qDebug() << "Terminate after player's step.";
         string msg = JudgeFunction(State);
         moves->setText(msg.c_str());
     }
@@ -309,16 +305,22 @@ int AI_player::Evaluation(vector<vector<int>> state){
 }
 
 pair<pair<int,int>, pair<char, pair<int, int>>> AI_player::Alpha_Beta_Search(vector<vector<int>> state){
-    BestAction = AI_Actions(state)[rand()%2];
+    nodecnt = 0, maxDepth = 0, maxPurn = 0, minPurn = 0;
+    auto actions = AI_Actions(state);
+    BestAction = actions[rand()%actions.size()];
+    start = std::clock();
     int val = Max_Value(state, INT_MIN, INT_MAX, 0);
+    qDebug() << "[log] node number generated: " << nodecnt << ", maximum depth: " << maxDepth << ", MAX function pruning times: " << maxPurn << ", MIN function pruning times: " << minPurn;
     return BestAction;
 }
 
 int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int level){
+    nodecnt++;
+    maxDepth = max(maxDepth,level);
     duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    if(Is_Terminal_State(state)) return Evaluation(state);
-    else if(level >= difficulty) return Evaluation(state);
-    else if(duration >= responseTime) return Evaluation(state);
+    if(Is_Terminal_State(state)){ return Evaluation(state); }
+    else if(level >= difficulty) {return Evaluation(state); }
+    else if(duration >= responseTime) {return Evaluation(state); }
 
     string t = to_string((int)duration) + " sec";
     time2->setText(t.c_str());
@@ -326,7 +328,10 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
     auto actions = AI_Actions(state);
     for(auto action: actions){
         val = max(val, Min_Value(UpdateState(state, action), alpha, beta, level+1));
-        if(val >= beta) return val;
+        if(val >= beta){
+            maxPurn++;
+            return val;
+        }
         if(val > alpha){
             if(level == 0){
                 alpha = val;
@@ -342,6 +347,8 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
 }
 
 int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int level){
+    nodecnt++;
+    maxDepth = max(maxDepth,level);
     duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     if(Is_Terminal_State(state)) return Evaluation(state);
     else if(level >= difficulty) return Evaluation(state);
@@ -353,7 +360,10 @@ int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int lev
     auto actions = Player_Actions(state);
     for(auto action: actions){
         val = min(val, Max_Value(UpdateState(state, action), alpha, beta, level+1));
-        if(val <= alpha) return val;
+        if(val <= alpha){
+            minPurn++;
+            return val;
+        }
         beta = min(beta, val);
     }
     return val;

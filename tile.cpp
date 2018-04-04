@@ -17,7 +17,7 @@ void AI_Start(){
 }
 
 void Player_Start(Tile *temp, int retValue){
-    for(int i = 0;i < valid_mv.size(); i++){
+    for(int i = 0; i < valid_mv.size(); i++){
         if(temp->tileNum == valid_mv[i]){
             EatFunction(temp);
             MoveFunction(temp, retValue);
@@ -25,12 +25,11 @@ void Player_Start(Tile *temp, int retValue){
             ai->Createstate(tile);
             if(!ai->Is_Terminal_State(ai->getState())){
                 if(turn%2 == 1){
-                    std::thread th1(AI_Start);
-                    th1.detach();
+                    std::thread th_ai(AI_Start);
+                    th_ai.detach();
                 }
             }
             else{
-                qDebug() << "Terminate after Player's step.";
                 string msg = ai->JudgeFunction(ai->getState());
                 moves->setText(msg.c_str());
             }
@@ -45,7 +44,7 @@ void validate(Tile *temp, int c){
     //First click
     if(c == 1){
         if(temp->piece){
-            retValue=valid->chooser(temp);
+            retValue = valid->chooser(temp);
             if(retValue){
                 click1= new Tile();
                 temp->setStyleSheet("QLabel {background-color: orange;}");
@@ -59,7 +58,7 @@ void validate(Tile *temp, int c){
     }
     else{
         //Unclick the original chosen one
-        if(temp->tileNum==click1->tileNum){
+        if(temp->tileNum == click1->tileNum){
             click1->tileDisplay();
             disOrange();
             valid_mv.clear();
@@ -74,7 +73,6 @@ void validate(Tile *temp, int c){
                 }
             }
             else{
-                qDebug() << "Terminate after AI's step.";
                 string msg = ai->JudgeFunction(ai->getState());
                 moves->setText(msg.c_str());
             }
@@ -103,9 +101,8 @@ void UpdateBoard(Tile *tile[6][6]){
                 else
                     tile[i][j]->display('B');
             }
-            else{
+            else
                 tile[i][j]->display('N');
-            }
         }
     }
 }

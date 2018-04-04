@@ -9,6 +9,7 @@ private:
     pair<pair<int,int>, pair<char, pair<int, int>>> BestAction;
     vector<vector<int>> State;
     std::clock_t start;
+    int nodecnt, maxDepth, maxPurn, minPurn;
 public:
     AI_player();
     void Createstate(Tile* tile[6][6]);
