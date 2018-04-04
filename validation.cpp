@@ -5,7 +5,6 @@ validation::validation(){
 }
 
 int validation::chooser(Tile *temp){
-
     CreateState(tile);
     CreateValidCheckersSet();
     if(v_checks.find(temp->tileNum) != v_checks.end()){
@@ -103,26 +102,26 @@ void validation::CreateValidCheckersSet(){
             }
         }
     }
+    //add the ForceJump checkers
     if(ForceJump){
         for(int i = 0; i < 6; i++){
             for(int j = 0; j < 6; j++){
                 if(State[i][j] == -1 && i-1>=0 && j-1>=0 && State[i-1][j-1] == 1 && i-2>=0 && j-2>=0 && State[i-2][j-2] == 0){
                     int tilenum = i*6 + j;
-                    v_checks.insert(tilenum);
+                    v_checks.emplace(tilenum);
                 }
                 else if(State[i][j] == -1 && i-1 >=0 && j+1 <6 && State[i-1][j+1] == 1 && i-2 >=0 && j+2 <6 && State[i-2][j+2] == 0){
                     int tilenum = i*6 + j;
-                    v_checks.insert(tilenum);
+                    v_checks.emplace(tilenum);
                 }
             }
         }
-        qDebug() << "Force";
     }
     else{
         for(int i = 0; i < 6; i++){
             for(int j = 0; j < 6; j++){
                 int tilenum = i*6 + j;
-                v_checks.insert(tilenum);
+                v_checks.emplace(tilenum);
             }
         }
     }

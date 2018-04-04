@@ -3,8 +3,6 @@
 #include "ai_player.h"
 #include <thread>
 
-validation *valid = new validation();
-AI_player *ai = new AI_player();
 void validate(Tile *temp,int c);
 void disOrange();
 void AI_Start();
@@ -19,7 +17,7 @@ void AI_Start(){
 }
 
 void Player_Start(Tile *temp, int retValue){
-    for(int i=0;i<valid_mv.size();i++){
+    for(int i = 0;i < valid_mv.size(); i++){
         if(temp->tileNum == valid_mv[i]){
             EatFunction(temp);
             MoveFunction(temp, retValue);

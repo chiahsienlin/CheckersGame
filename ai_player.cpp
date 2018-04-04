@@ -5,10 +5,8 @@
 #include <thread>
 
 double duration;
-
 AI_player::AI_player(){
     State.resize(6, vector<int> (6,0));
-    AI_Has_No_Move = false;
 }
 
 void AI_player::AI_MainFunction(Tile *tile[6][6]){
@@ -22,9 +20,8 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
             if(!Is_Terminal_State(newState)){
                 string msg ="Turn " + to_string(turn+1) + ": AI is done. It's your turn.";
                 moves->setText(msg.c_str());
-                if(!Player_Actions(newState).empty())
-                    turn++;
-                else{
+                turn++;
+                if(Player_Actions(newState).empty()){
                     string msg ="Turn " + to_string(turn+1) + ": You can't move. AI's turn!";
                     moves->setText(msg.c_str());
                     while(!AI_Actions(newState).empty()){
@@ -49,11 +46,8 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
         else{
             string msg ="Turn " + to_string(turn+1) + ": AI can't move. Your turn!";
             moves->setText(msg.c_str());
-            if(!AI_Has_No_Move){
-                qDebug() << "!!";
-                turn++;
-                AI_Has_No_Move = true;
-            }
+            turn++;
+            qDebug() << turn;
         }
     }
     else{
@@ -283,15 +277,20 @@ int AI_player::Evaluation(vector<vector<int>> state){
     int cntBlack = 0, cntWhite = 0;
     int whiteBound = 0, BlackBound = 5;
     int safeBlack = 0, safeWhite = 0;
+    int BorderBlack = 0, BorderWhite = 0;
     for(int i = 0; i < 6; i++){
         for(int j = 0; j < 6; j++){
             if(state[i][j] == 1){
                 whiteBound = min(whiteBound, i);
                 cntWhite++;
+                if(i==0 || i==5 || j==0 || j==5)
+                    BorderWhite++;
             }
             else if(state[i][j] == -1){
                 BlackBound = max(BlackBound, i);
                 cntBlack++;
+                if(i==0 || i==5 || j==0 || j==5)
+                    BorderBlack++;
             }
         }
     }
@@ -305,7 +304,7 @@ int AI_player::Evaluation(vector<vector<int>> state){
             }
         }
     }
-    int res = (cntWhite - cntBlack)*2 + (safeWhite - safeBlack);
+    int res = (cntWhite - cntBlack)*3 + (safeWhite - safeBlack) + (BorderWhite - BorderBlack)*2;
     return res;
 }
 

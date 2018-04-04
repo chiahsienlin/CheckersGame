@@ -9,7 +9,6 @@ private:
     pair<pair<int,int>, pair<char, pair<int, int>>> BestAction;
     vector<vector<int>> State;
     std::clock_t start;
-    bool AI_Has_No_Move;
 public:
     AI_player();
     void Createstate(Tile* tile[6][6]);
@@ -29,5 +28,5 @@ public:
     //--Main Function--
     void AI_MainFunction(Tile* tile[6][6]);
 };
-
+extern AI_player *ai;
 #endif // AI_PLAYER_H

@@ -1,6 +1,15 @@
 #include <QApplication>
+#include <QtGui>
+#include <QInputDialog>
+#include <QMessageBox>
 #include "mainwindow.h"
 #include "tile.h"
+#include "validation.h"
+#include "ai_player.h"
+#include <thread>
+using namespace std;
+QTextStream cout(stdout);
+QTextStream cin(stdin);
 
 int cnt = 0,turn = 0;
 double responseTime = 15.00;
@@ -11,6 +20,8 @@ Tile *click1 = NULL;
 Tile *tile[6][6] = {{ NULL }};
 QLabel *moves;
 QLabel *time2;
+validation *valid = new validation();
+AI_player *ai = new AI_player();
 
 class Border{
 public:
@@ -24,20 +35,54 @@ public:
         outLabel->setStyleSheet("QLabel { background-color :rgb(80, 50, 50); color : black; }");
     }
 };
-
+void AI_StartFirst();
 void accessories(QWidget *baseWidget);
 void chessBoard(QWidget *baseWidget, Tile *tile[6][6]);
 
 int main(int argc, char *argv[]){
+    int answer = 0;
+    int level = 1;
     QApplication a(argc, argv);
+    QTextStream cout(stdout);
     QWidget *myWidget = new QWidget();
     myWidget->setGeometry(0,0,1370,700);
     accessories(myWidget);
     chessBoard(myWidget,tile);
+    do{
+        QInputDialog dialog;
+        level = dialog.getInt(0, "Difficulty 1 to 5", "level", 1,1,5);
+        cout << "User entered: " << level << endl;
+        QString response = QString("The Level you choose is %1.\n").arg(level);
+        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No);
+    }while(answer == QMessageBox::No);
+    do{
+        QInputDialog dialog;
+        turn = dialog.getInt(0, "Who first?", "0. You first  1. AI first", 0,0,1);
+        cout << "User entered: " << level << endl;
+        QString response;
+        if(!turn)
+            response= QString("You choose You first.\n").arg(turn);
+        else
+            response = QString("You choose AI first.\n").arg(turn);
+        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No);
+    }while(answer == QMessageBox::No);
+    difficulty = level*3 + 1;
     myWidget->show();
+    if(turn){
+        thread th(AI_StartFirst);
+        th.detach();
+        turn++;
+    }
     return a.exec();
 }
 
+void AI_StartFirst(){
+    ai->Createstate(tile);
+    auto action = ai->Alpha_Beta_Search(ai->getState());
+    auto newState = ai->UpdateState(ai->getState(), action);
+    ai->UpdateStateToTile(newState, tile);
+    UpdateBoard(tile);
+}
 void accessories(QWidget *baseWidget){
     QLabel *player2 = new QLabel(baseWidget);
     QLabel *name2 = new QLabel("AI Player", baseWidget);

@@ -22,5 +22,5 @@ public:
     void CreateState(Tile* tile[6][6]);
     void CreateValidCheckersSet();
 };
-
+extern validation *valid;
 #endif // VALIDATION_H
