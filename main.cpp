@@ -44,25 +44,34 @@ int main(int argc, char *argv[]){
     myWidget->setGeometry(0,0,1370,700);
     accessories(myWidget);
     chessBoard(myWidget,tile);
+
     do{
+        bool ok;
         QInputDialog dialog;
-        level = dialog.getInt(0, "Difficulty 1 to 5", "level", 1,1,5);
-        QString response = QString("The Level you choose is %1.\n").arg(level);
-        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
-        if(answer == QMessageBox::Close)
-            return a.exec();
+        level = dialog.getInt(0, "Difficulty 1 to 5", "level", 1,1,5,1,&ok,Qt::CustomizeWindowHint);
+        if(ok){
+            QString response = QString("The Level you choose is %1.\n").arg(level);
+            answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
+            if(answer == QMessageBox::Close) return 0;
+        }
+        else
+            return 0;
     }while(answer == QMessageBox::No);
     do{
+        bool ok;
         QInputDialog dialog;
-        turn = dialog.getInt(0, "Who first?", "0. You first  1. AI first", 0,0,1);
-        QString response;
-        if(!turn)
-            response= QString("You choose You first.");
+        turn = dialog.getInt(0, "Who first?", "0. You first  1. AI first", 0,0,1,1,&ok,Qt::CustomizeWindowHint);
+        if(ok){
+            QString response;
+            if(!turn)
+                response= QString("You choose You first.");
+            else
+                response = QString("You choose AI first.");
+            answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
+            if(answer == QMessageBox::Close) return 0;
+        }
         else
-            response = QString("You choose AI first.");
-        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
-        if(answer == QMessageBox::Close)
-            return a.exec();
+            return 0;
     }while(answer == QMessageBox::No);
     difficulty = level*3 + 1;
     std::thread th_m;
