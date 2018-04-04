@@ -48,7 +48,9 @@ int main(int argc, char *argv[]){
         QInputDialog dialog;
         level = dialog.getInt(0, "Difficulty 1 to 5", "level", 1,1,5);
         QString response = QString("The Level you choose is %1.\n").arg(level);
-        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No);
+        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
+        if(answer == QMessageBox::Close)
+            return a.exec();
     }while(answer == QMessageBox::No);
     do{
         QInputDialog dialog;
@@ -58,14 +60,15 @@ int main(int argc, char *argv[]){
             response= QString("You choose You first.");
         else
             response = QString("You choose AI first.");
-        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No);
+        answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
+        if(answer == QMessageBox::Close)
+            return a.exec();
     }while(answer == QMessageBox::No);
     difficulty = level*3 + 1;
     std::thread th_m;
     if(turn){
         th_m = std::thread(AI_StartFirst);
         th_m.detach();
-        turn++;
     }
     myWidget->show();
     return a.exec();
@@ -77,6 +80,9 @@ void AI_StartFirst(){
     auto newState = ai->UpdateState(ai->getState(), action);
     ai->UpdateStateToTile(newState, tile);
     UpdateBoard(tile);
+    string msg ="Turn " + to_string(turn) + ": AI is done. It's your turn.";
+    moves->setText(msg.c_str());
+    turn++;
 }
 
 void accessories(QWidget *baseWidget){

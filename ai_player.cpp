@@ -17,14 +17,14 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
             auto newState = UpdateState(State, action);
             UpdateStateToTile(newState, tile);
             if(!Is_Terminal_State(newState)){
-                string msg ="Turn " + to_string(turn+1) + ": AI is done. It's your turn.";
+                string msg ="Turn " + to_string(turn) + ": AI is done. It's your turn.";
                 moves->setText(msg.c_str());
                 turn++;
                 if(Player_Actions(newState).empty()){
-                    string msg ="Turn " + to_string(turn+1) + ": You can't move. AI's turn!";
+                    string msg ="Turn " + to_string(turn) + ": You can't move. AI's turn!";
                     moves->setText(msg.c_str());
                     while(!AI_Actions(newState).empty()){
-                        msg = "AI Player is moving ....";
+                        msg = "AI is moving to end the game.....";
                         moves->setText(msg.c_str());
                         action = Alpha_Beta_Search(newState);
                         newState = UpdateState(newState, action);
@@ -42,7 +42,7 @@ void AI_player::AI_MainFunction(Tile *tile[6][6]){
             }
         }
         else{
-            string msg ="Turn " + to_string(turn+1) + ": AI can't move. Your turn!";
+            string msg ="Turn " + to_string(turn) + ": AI can't move. Your turn!";
             moves->setText(msg.c_str());
             turn++;
         }
@@ -270,10 +270,13 @@ vector<pair<pair<int,int>, pair<char, pair<int, int>>>> AI_player::Player_Action
 }
 
 int AI_player::Evaluation(vector<vector<int>> state){
-    int cntBlack = 0, cntWhite = 0;
     int whiteBound = 0, BlackBound = 5;
-    int safeBlack = 0, safeWhite = 0;
     int BorderBlack = 0, BorderWhite = 0;
+    int cntBlack = 0, cntWhite = 0;   
+    int safeBlack = 0, safeWhite = 0;
+    int halfsafeBlack = 0, halfsafeWhite = 0;
+    int DangerousBack = 0, DangerousWhite = 0;
+
     for(int i = 0; i < 6; i++){
         for(int j = 0; j < 6; j++){
             if(state[i][j] == 1){
@@ -281,12 +284,40 @@ int AI_player::Evaluation(vector<vector<int>> state){
                 cntWhite++;
                 if(i==0 || i==5 || j==0 || j==5)
                     BorderWhite++;
+                else{
+                    if(i-1>=0 && (j-1>=0 && state[i-1][j-1] == 1) && (j+1<6 && state[i-1][j+1] == 1) )
+                        safeWhite++;
+                    else if((i-1>=0 && j-1>=0 && state[i-1][j-1] == 0) && (i+1<6 && j+1<6 && state[i+1][j+1] == 0))
+                        safeWhite++;
+                    else if((i-1>=0 && j-1>=0 && state[i-1][j-1] == 0) && (i+1<6 && j+1<6 && state[i+1][j+1] == -1))
+                        DangerousWhite++;
+                    else if((i-1>=0 && j+1<6 && state[i-1][j+1] == 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] == 0))
+                        safeWhite++;
+                    else if((i-1>=0 && j+1<6 && state[i-1][j+1] == 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] == -1))
+                        DangerousWhite++;
+                    else if( i-1>= 0 && (j-1>=0 && state[i-1][j-1] == 1) || (j+1<6 && state[i-1][j-1] == 1) )
+                        halfsafeWhite++;
+                }
             }
             else if(state[i][j] == -1){
                 BlackBound = max(BlackBound, i);
                 cntBlack++;
                 if(i==0 || i==5 || j==0 || j==5)
                     BorderBlack++;
+                else{
+                    if(i+1<6 && (j-1>=0 && state[i+1][j-1] == -1) && (j+1<6 && state[i+1][j+1] == -1) )
+                        safeBlack++;
+                    else if((i+1<6 && j-1>=0 && state[i+1][j-1] == 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] == 0))
+                        safeBlack++;
+                    else if((i+1<6 && j-1>=0 && state[i+1][j-1] == 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] == 1))
+                        DangerousBack++;
+                    else if((i+1<6 && j+1<6 && state[i+1][j+1] == 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] == 0))
+                        safeBlack++;
+                    else if((i+1<6 && j+1<6 && state[i+1][j+1] == 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] == 1))
+                        DangerousBack++;
+                    else if( i+1<6 && (j-1>=0 && state[i+1][j-1] == -1) || (j+1<6 && state[i+1][j+1] == -1) )
+                        halfsafeBlack++;
+                }
             }
         }
     }
@@ -300,7 +331,7 @@ int AI_player::Evaluation(vector<vector<int>> state){
             }
         }
     }
-    int res = (cntWhite - cntBlack)*3 + (safeWhite - safeBlack) + (BorderWhite - BorderBlack)*2;
+    int res = (cntWhite - cntBlack)*60 + (safeWhite - safeBlack)*100 + (DangerousBack - DangerousWhite)*50 + (BorderWhite - BorderBlack)*30 + (halfsafeWhite-halfsafeBlack)*20;
     return res;
 }
 
