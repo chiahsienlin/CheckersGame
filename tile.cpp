@@ -14,6 +14,7 @@ void RenewBoard(Tile * temp);
 void AI_Start(){
     ai->AI_MainFunction(tile);
     UpdateBoard(tile);
+    turn++;
 }
 
 void Player_Start(Tile *temp, int retValue){

@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QTextEdit>
 #include "mainwindow.h"
 #include "tile.h"
 #include "validation.h"
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]){
     do{
         bool ok;
         QInputDialog dialog;
-        level = dialog.getInt(0, "Difficulty 1 to 5", "level", 1,1,5,1,&ok,Qt::CustomizeWindowHint);
+        level = dialog.getInt(0, "Difficulty", "level 1 to 5", 1,1,5,1,&ok,Qt::CustomizeWindowHint);
         if(ok){
             QString response = QString("The Level you choose is %1.\n").arg(level);
             answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
@@ -73,6 +74,7 @@ int main(int argc, char *argv[]){
         else
             return 0;
     }while(answer == QMessageBox::No);
+
     difficulty = level*3 + 1;
     std::thread th_m;
     if(turn){
@@ -89,7 +91,7 @@ void AI_StartFirst(){
     auto newState = ai->UpdateState(ai->getState(), action);
     ai->UpdateStateToTile(newState, tile);
     UpdateBoard(tile);
-    string msg ="Turn " + to_string(turn) + ": AI is done. It's your turn.";
+    string msg = "[AI] I'm done. It's your turn!\n";
     moves->setText(msg.c_str());
     turn++;
 }
@@ -97,7 +99,7 @@ void AI_StartFirst(){
 void accessories(QWidget *baseWidget){
     QLabel *player2 = new QLabel(baseWidget);
     QLabel *name2 = new QLabel("AI Player", baseWidget);
-    time2 = new QLabel("0 sec", baseWidget);
+    time2 = new QLabel("Timer: 0 sec", baseWidget);
 
     QLabel *player1 = new QLabel(baseWidget);
     QLabel *name1 = new QLabel("You", baseWidget);
@@ -114,6 +116,7 @@ void accessories(QWidget *baseWidget){
     moves = new QLabel(baseWidget);
     moves->setGeometry(1000,105,250,550);
     moves->setStyleSheet("QLabel {background-color: white;}");
+
 }
 
 void chessBoard(QWidget *baseWidget, Tile *tile[6][6]){
