@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
     do{
         bool ok;
         QInputDialog dialog;
-        level = dialog.getInt(0, "Difficulty", "level 1 to 5", 1,1,5,1,&ok,Qt::CustomizeWindowHint);
+        level = dialog.getInt(0, "Difficulty", "level 1 to 3", 1,1,3,1,&ok,Qt::CustomizeWindowHint);
         if(ok){
             QString response = QString("The Level you choose is %1.\n").arg(level);
             answer = QMessageBox::question(0, "Are you sure?", response, QMessageBox::Yes | QMessageBox::No | QMessageBox::Close);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]){
             return 0;
     }while(answer == QMessageBox::No);
 
-    difficulty = level*3 + 1;
+    difficulty = level*5 + 1;
     std::thread th_m;
     if(turn){
         th_m = std::thread(AI_StartFirst);

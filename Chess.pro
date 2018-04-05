@@ -1,8 +1,11 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator
-#
-#-------------------------------------------------
+#------------------------------------------------------------------------
+# Project Title: Mini-Checkers Game (6x6)
+# Project author: Chia-Hsien Lin
+# Email: chl566@nyu.edu
+# Last Modify Date: Apr5, 2018
+# Rules: https://en.wikipedia.org/wiki/Draughts
+# [Note] Every opportunity to jump must be taken.
+#------------------------------------------------------------------------
 
 QT       += core gui
 
