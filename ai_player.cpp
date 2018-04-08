@@ -4,6 +4,10 @@
 #include <ctime>
 #include <thread>
 
+string actLog;
+string utilityLog;
+string evalueLog;
+
 double duration;
 AI_player::AI_player(){
     State.resize(6, vector<int> (6,0));
@@ -57,8 +61,13 @@ pair<pair<int,int>, pair<char, pair<int, int>>> AI_player::Alpha_Beta_Search(vec
     auto actions = AI_Actions(state);
     BestAction = actions[rand()%actions.size()];
     start = std::clock();
+
     int val = Max_Value(state, INT_MIN, INT_MAX, 0);
-    qDebug() << "[log] node number generated: " << nodecnt << ", maximum depth: " << maxDepth << ", MAX function pruning times: " << maxPurn << ", MIN function pruning times: " << minPurn << ", Utility: " << val;
+    qDebug() << actLog.c_str() << evalueLog.c_str() << utilityLog.c_str();
+    actLog.clear();
+    evalueLog.clear();
+    utilityLog.clear();
+
     return BestAction;
 }
 
@@ -69,24 +78,32 @@ int AI_player::Max_Value(vector<vector<int>> state, int alpha, int beta, int lev
     string t = "Timer: " + to_string((int)duration) + " sec";
     time2->setText(t.c_str());
 
-    if(Is_Terminal_State(state)){ return Evaluation(state); }
-    else if(level >= difficulty) {return Evaluation(state); }
-    else if(duration >= responseTime) {return Evaluation(state); }
-
+    if(Is_Terminal_State(state)){
+        utilityLog = "[log] node number generated: " + to_string(nodecnt) + ", maximum depth: " + to_string(maxDepth) + ", MAX function pruning times: " + to_string(maxPurn) + ", MIN function pruning times: " + to_string(minPurn) + "\n";
+        return Utility(state);
+    }
+    else if(level >= difficulty || duration >= responseTime) {
+        evalueLog = "[log] node number generated: " +  to_string(nodecnt) + ", cutoff level: " + to_string(maxDepth) + ", MAX function pruning times: " + to_string(maxPurn) + ", MIN function pruning times: " + to_string(minPurn) + "\n";
+        return Evaluation(state);
+    }
     int val = INT_MIN;
     auto actions = AI_Actions(state);
     for(auto action: actions){
         val = max(val, Min_Value(UpdateState(state, action), alpha, beta, level+1));
         if(val >= beta){
+            if(level == 0){
+                BestAction = action;
+                actLog = "[+] Best Action (" + to_string(BestAction.first.first) + ","  +  to_string(BestAction.first.second) + ")" + ", (" + BestAction.second.first + ", " + to_string(BestAction.second.second.first) + "," + to_string(BestAction.second.second.second)+ ")) with utility = " + to_string(val) + "\n";
+            }
             maxPurn++;
             return val;
         }
-        if(val > alpha){
-            alpha = val;
+        if(val > alpha || val == INT_MIN || val == INT_MAX){
             if(level == 0){
                 BestAction = action;
-                qDebug() << "[+] Best Action (" << BestAction.first.first << "," << BestAction.first.second << ")" << ", ("<< BestAction.second.first <<", " << BestAction.second.second.first << "," << BestAction.second.second.second << ")) with utility = " << val;
+                actLog = "[+] Best Action (" + to_string(BestAction.first.first) + ","  +  to_string(BestAction.first.second) + ")" + ", (" + BestAction.second.first + ", " + to_string(BestAction.second.second.first) + "," + to_string(BestAction.second.second.second)+ ")) with utility = " + to_string(val) + "\n";
             }
+            alpha = val;
         }
     }
     return val;
@@ -99,9 +116,14 @@ int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int lev
     string t = "Timer: " + to_string((int)duration) + " sec";
     time2->setText(t.c_str());
 
-    if(Is_Terminal_State(state)) return Evaluation(state);
-    else if(level >= difficulty) return Evaluation(state);
-    else if(duration >= responseTime) return Evaluation(state);
+    if(Is_Terminal_State(state)){
+        utilityLog = "[log] node number generated: " + to_string(nodecnt) + ", maximum depth: " + to_string(maxDepth) + ", MAX function pruning times: " + to_string(maxPurn) + ", MIN function pruning times: " + to_string(minPurn) + "\n";
+        return Utility(state);
+    }
+    else if(level >= difficulty || duration >= responseTime) {
+        evalueLog = "[log] node number generated: " +  to_string(nodecnt) + ", cutoff level: " + to_string(maxDepth) + ", MAX function pruning times: " + to_string(maxPurn) + ", MIN function pruning times: " + to_string(minPurn) + "\n";
+        return Evaluation(state);
+    }
 
     int val = INT_MAX;
     auto actions = Player_Actions(state);
@@ -116,11 +138,25 @@ int AI_player::Min_Value(vector<vector<int>> state, int alpha, int beta, int lev
     return val;
 }
 
+int AI_player::Utility(vector<vector<int>> state){
+    int cntBlack = 0, cntWhite = 0;
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < 6; j++){
+            if(state[i][j] == 1)
+                cntWhite++;
+            else if(state[i][j] == -1)
+                cntBlack++;
+        }
+    }
+    return (cntWhite > cntBlack) ? INT_MAX : INT_MIN;
+}
+
 int AI_player::Evaluation(vector<vector<int>> state){
     int whiteBound = 0, BlackBound = 5;
     int cntBlack = 0, cntWhite = 0;
     int safeBlack = 0, safeWhite = 0;
-    int DangerousBack = 0, DangerousWhite = 0;
+    int SafeEatBlack = 0, SafeEatWhite = 0;
+    int borderBlack = 0, borderWhite = 0;
 
     for(int i = 0; i < 6; i++){
         for(int j = 0; j < 6; j++){
@@ -128,30 +164,34 @@ int AI_player::Evaluation(vector<vector<int>> state){
                 whiteBound = min(whiteBound, i);
                 cntWhite++;
                 if(i==0 || i==5 || j==0 || j==5)
-                    safeWhite++;
+                    borderWhite++;
                 else{
                     if((i-1>=0 && j-1>=0 && state[i-1][j-1] != 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] != 0)) safeWhite++;
                     if((i-1>=0 && j-1>=0 && state[i-1][j-1] != 0) && (i+1<6 && j+1<6 && state[i+1][j+1] != 0)) safeWhite++;
                     if((i-1>=0 && j+1<6 && state[i-1][j+1] != 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] != 0)) safeWhite++;
-                    if((i-1>=0 && j-1>=0 && state[i-1][j-1] == 0) && (i+1<6 && j+1<6 && state[i+1][j+1] == 0)) safeWhite++;
-                    if((i-1>=0 && j+1<6 && state[i-1][j+1] == 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] == 0)) safeWhite++;
-                    if((i-1>=0 && j-1>=0 && state[i-1][j-1] == 0) && (i+1<6 && j+1<6 && state[i+1][j+1] == -1)) DangerousWhite++;
-                    if((i-1>=0 && j+1<6 && state[i-1][j+1] == 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] == -1)) DangerousWhite++;
+                    if((i+1<6 && j+1<6 && state[i+1][j+1] == 0) && (i+2<6 && j+2<6 && state[i+2][j+2] != -1)) safeWhite++;
+                    if((i+1<6 && j-1>=0 && state[i+1][j-1] == 0) && (i+2<6 && j-2>=0 && state[i+2][j-2] != -1)) safeWhite++;
+                    if((i-1>=0 && j-1>=0 && state[i-1][j-1] == 0) && (i+1<6 && j+1<6 && state[i+1][j+1] != -1)) safeWhite++;
+                    if((i-1>=0 && j+1<6 && state[i-1][j+1] == 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] != -1)) safeWhite++;
+                    if((i-1>=0 && j-1>=0 && state[i-1][j-1] != 0) && (i+1<6 && j+1<6 && state[i+1][j+1] == -1) && (i+2<6 && j+2<6 && state[i+2][j+2] == 0)) SafeEatBlack++;
+                    if((i-1>=0 && j+1<6 && state[i-1][j+1] != 0) && (i+1<6 && j-1>=0 && state[i+1][j-1] == -1) && (i+2<6 && j-2>=0 && state[i+2][j-2] == 0)) SafeEatBlack++;
                 }
             }
             else if(state[i][j] == -1){
                 BlackBound = max(BlackBound, i);
                 cntBlack++;
                 if(i==0 || i==5 || j==0 || j==5)
-                    safeBlack++;
+                    borderBlack++;
                 else{
                     if((i+1<6 && j-1>=0 && state[i+1][j-1] != 0) && (i+1<6 && j+1<6 && state[i+1][j+1] != 0)) safeBlack++;
                     if((i+1<6 && j-1>=0 && state[i+1][j-1] != 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] != 0)) safeBlack++;
                     if((i+1<6 && j+1<6 && state[i+1][j+1] != 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] != 0)) safeBlack++;
-                    if((i+1<6 && j-1>=0 && state[i+1][j-1] == 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] == 0)) safeBlack++;
-                    if((i+1<6 && j+1<6 && state[i+1][j+1] == 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] == 0)) safeBlack++;
-                    if((i+1<6 && j-1>=0 && state[i+1][j-1] == 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] == 1) && (i-2>=0 && j+2<6 && state[i-2][j+2] != 0)) DangerousBack++;
-                    if((i+1<6 && j+1<6 && state[i+1][j+1] == 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] == 1) && (i-2>=0 && j-2>=0 && state[i-2][j-2] != 0)) DangerousBack++;
+                    if((i-1>=0 && j-1>=0 && state[i-1][j-1] == 0) && (i-2>=0 && j-2>=0 && state[i-2][j-2] != 1)) safeBlack++;
+                    if((i-1>=0 && j+1<6 && state[i-1][j+1] == 0) && (i-2>=0 && j+2<6 && state[i-2][j+2] != 1)) safeBlack++;
+                    if((i+1<6 && j-1>=0 && state[i+1][j-1] == 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] != 1)) safeBlack++;
+                    if((i+1<6 && j+1<6 && state[i+1][j+1] == 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] != 1)) safeBlack++;
+                    if((i+1<6 && j+1<6 && state[i+1][j+1] != 0) && (i-1>=0 && j-1>=0 && state[i-1][j-1] == 1) && (i-2>=0 && j-2>=0 && state[i-2][j-2] == 0)) SafeEatWhite++;
+                    if((i+1<6 && j-1<6 && state[i+1][j-1] != 0) && (i-1>=0 && j+1<6 && state[i-1][j+1] != 0) && (i-2>=0 && j+2>=0 && state[i-2][j+2] == 0)) SafeEatWhite++;
                 }
             }
         }
@@ -164,7 +204,7 @@ int AI_player::Evaluation(vector<vector<int>> state){
                safeBlack++;
         }
     }
-    int res = (cntWhite - cntBlack)*300 + (safeWhite - safeBlack)*600 + (DangerousBack)*200 - (DangerousWhite)*400;
+    int res = (cntWhite - cntBlack)*1000 + (safeWhite - safeBlack)*3000 + (SafeEatBlack - SafeEatWhite)*2000  + (borderWhite - borderBlack)*500;
     return res;
 }
 

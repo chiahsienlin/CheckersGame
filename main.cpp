@@ -10,7 +10,7 @@
 
 int cnt = 0,turn = 0;
 double responseTime = 15.00;
-int difficulty = 16;
+int difficulty = 20;
 std::vector<int> valid_mv;
 std::vector<int> eat;
 Tile *click1 = NULL;
@@ -32,6 +32,7 @@ public:
         outLabel->setStyleSheet("QLabel { background-color :rgb(80, 50, 50); color : black; }");
     }
 };
+
 void AI_StartFirst();
 void accessories(QWidget *baseWidget);
 void chessBoard(QWidget *baseWidget, Tile *tile[6][6]);
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]){
     accessories(myWidget);
     chessBoard(myWidget,tile);
 
-    do{
+    do{//Choose the level
         bool ok;
         QInputDialog dialog;
         level = dialog.getInt(0, "Difficulty", "level 1 to 3", 1,1,3,1,&ok,Qt::CustomizeWindowHint);
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]){
         else
             return 0;
     }while(answer == QMessageBox::No);
-    do{
+    do{//Choose who moves first
         bool ok;
         QInputDialog dialog;
         turn = dialog.getInt(0, "Who first?", "0. You first  1. AI first", 0,0,1,1,&ok,Qt::CustomizeWindowHint);
@@ -74,10 +75,10 @@ int main(int argc, char *argv[]){
         else
             return 0;
     }while(answer == QMessageBox::No);
+    difficulty = level*5+2;
 
-    difficulty = level*5 + 1;
     std::thread th_m;
-    if(turn){
+    if(turn){//AI's first step
         th_m = std::thread(AI_StartFirst);
         th_m.detach();
     }
