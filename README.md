@@ -2,18 +2,17 @@
 The game is played on a reduced game board size of 6x6 squares and the rules have been modified from the original checkers game.
 
 ## Evironment Setup
-• Language: C++
-• Operating System: macOS High Sierra version 10.13.1
-• IDE: Qt Creator 5.11.0
-• Qt/5.11.0/clang_64/bin/qmake
+### Language: C++
+### Operating System: macOS High Sierra version 10.13.1
+### IDE: Qt Creator 5.11.0
+### Qt/5.11.0/clang_64/bin/qmake
 
 ## How to Build
-• Install qt5-qmake
-• In the project directory, execute command /.../Qt/5.11.0/clang_64/bin/qmake .
-• You will see a Makefile, and execute command make
-• You will see an application be generated
-
-• Now, you can run the game
+### Install qt5-qmake
+### In the project directory, execute command /.../Qt/5.11.0/clang_64/bin/qmake .
+### You will see a Makefile, and execute command make
+### You will see an application be generated
+### Now, you can run the game
 
 ## Executalbe (Only for MacOS)
 • You can download the compressed executable file from 
