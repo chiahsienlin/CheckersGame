@@ -28,3 +28,10 @@ The game is played on a reduced game board size of 6x6 squares and the rules hav
   * No vertical, horizontal or backward moves areallowedforbothregularand capture moves.
 * If a player has no legal move to take, his/her turn will be forfeited and the other player will make the next move.
 * A player wins when he/she captures all of the other player’s pieces. If both players do not have any legal move to take, the game will end and the player with the most number of pieces left wins; if the two players have the same number of pieces       left, the game is a draw.
+
+## User Interface
+![alt text](https://github.com/chiahsienlin/CheckersGame/blob/master/Images/interface.png)
+* Before getting into the interface above, you have to choose the difficulty from 1 to 3 and who will move the first step.
+* The timer on the left-hand side is for timing the AI player making a move. (no more than 15 sec)
+* If you want to move one of the checkers pieces, click the one you choose once and you will see the valid tiles turning into yellow. Click one of the valid tiles to make a move or unclick the original checkers piece you choose.
+* The whiteboard on the right-hand side is for the purpose of displaying the status of the game and the judgement given by the judge.
