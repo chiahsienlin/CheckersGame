@@ -17,7 +17,7 @@ The game is played on a reduced game board size of 6x6 squares and the rules hav
 ## Executalbe (Only for MacOS)
 1.  You can download the compressed executable file from 
     https://github.com/chiahsienlin/CheckersGame/blob/master/Checkers.zip
-2.  Decompressed the file
+2.  `tar -xf Checkers.zip ` and you will get the 'Checkers' application
 3.  Set the security authority: Go to the System Preferences → Security & Privacy → Open anyway
 
 ## Rule Description
