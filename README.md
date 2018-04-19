@@ -1,5 +1,5 @@
 # CheckersGame
-The game is played on a reduced game board size of 6x6 squares and the rules have been modified from the original checkers game. The details about the user flow, the utility function and the cut-off evaluation function could be found in the report.pdf
+The game is played on a reduced game board size of 6x6 squares and the rules have been modified from the original checkers game. The details about the user flow, the utility function and the cut-off evaluation function could be found in the report.(https://github.com/chiahsienlin/CheckersGame/blob/master/report.pdf)
 
 ## Evironment Setup
 1.  Language: C++
