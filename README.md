@@ -1,5 +1,5 @@
 # CheckersGame
-The game is played on a reduced game board size of 6x6 squares and the rules have been modified from the original checkers game.
+The game is played on a reduced game board size of 6x6 squares and the rules have been modified from the original checkers game. The details about the user flow, the utility function and the cut-off evaluation function could be found in the report.pdf
 
 ## Evironment Setup
 1.  Language: C++
@@ -9,9 +9,9 @@ The game is played on a reduced game board size of 6x6 squares and the rules hav
 
 ## How to Build
 1.  Install qt5-qmake
-2.  In the project directory, execute command `/.../Qt/5.11.0/clang_64/bin/qmake.`
-3.  You will see a Makefile, and execute command make
-4.  You will see an application be generated
+2.  In the project directory, execute command `/.../Qt/5.11.0/clang_64/bin/qmake .`
+3.  qmake will automatically generate a Makefile, and execute command `make`
+4.  The executable application will be generated
 5.  Now, you can run the game
 
 ## Executalbe (Only for MacOS)
