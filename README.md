@@ -2,10 +2,10 @@
 The game is played on a reduced game board size of 6x6 squares and the rules have been modified from the original checkers game. The details about the user flow, the utility function and the cut-off evaluation function could be found in the report.(https://github.com/chiahsienlin/CheckersGame/blob/master/report.pdf)
 
 ## Evironment Setup
-1.  Language: C++
-2.  Operating System: macOS High Sierra version 10.13.1
-3.  IDE: Qt Creator 5.11.0
-4.  Qt/5.11.0/clang_64/bin/qmake
+*  Language: C++
+*  Operating System: macOS High Sierra version 10.13.1
+*  IDE: Qt Creator 5.11.0
+*  Qt/5.11.0/clang_64/bin/qmake
 
 ## How to Build
 1.  Install qt5-qmake
