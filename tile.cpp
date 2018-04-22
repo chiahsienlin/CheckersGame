@@ -116,10 +116,10 @@ void Tile::mousePressEvent(QMouseEvent *event){
 void Tile::display(char elem){
     this->pieceName=elem;
     if(this->pieceColor && this->piece){
-        this->setPixmap(QPixmap(":/Images/white.svg"));
+        this->setPixmap(QPixmap(":/Images/whitepiece.svg"));
     }
     else if(this->piece){
-        this->setPixmap(QPixmap(":/Images/black.svg"));
+        this->setPixmap(QPixmap(":/Images/blackpiece.svg"));
     }
     else
         this->clear();

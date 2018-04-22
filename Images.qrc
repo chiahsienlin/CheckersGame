@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>Images/profile.png</file>
-        <file>Images/black.svg</file>
-        <file>Images/white.svg</file>
+        <file>Images/blackpiece.svg</file>
+        <file>Images/whitepiece.svg</file>
     </qresource>
 </RCC>
